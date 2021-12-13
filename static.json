@@ -1,0 +1,7 @@
+{
+  "root": "dist",
+  "clan_urls": true,
+  "routs": {
+    "/**": "index.html"
+  }
+}
