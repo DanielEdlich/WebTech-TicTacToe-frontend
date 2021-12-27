@@ -10,17 +10,16 @@
   <button type="button" @click = "getGameById(requestId)">search for Game</button>
 
   <div class="board">
-    <div v-for = "n in board" :key="n">
-      <div v-for="m in n" :key="m" class="cell">
-<!--        <span v-if="m !== '-'"> {{ m }} </span>
-        <span v-else>  </span>-->
-        <span> {{ m }} </span>
+    <div v-for = "m in board.length" :key="m">
+      <div v-for="n in board[m-1].length" :key="n" class="cell" @click="processAction(m-1, n-1)">
+        <span v-if="board[m-1][n-1] !== '-'"> {{ board[m-1][n-1] }} </span>
+        <span v-else> </span>
       </div>
     </div>
   </div>
 
-  <span>{{game}}</span>
-  <span>{{board}}</span>
+<!--  <span>{{game}}</span>
+  <span>{{board}}</span>-->
 
 </template>
 
@@ -42,7 +41,7 @@ export default {
       },
       board: [
         ['', '', ''],
-        ['', 'x', ''],
+        ['', '', ''],
         ['', '', '']
       ]
     }
@@ -95,6 +94,9 @@ export default {
         .then(response => response.json())
         .then(result => console.log(result))
         .catch(error => console.log('error', error))
+    },
+    processAction (m, n) {
+      this.board[m][n] = 'x'
     }
   }
 }
