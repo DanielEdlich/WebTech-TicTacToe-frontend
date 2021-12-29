@@ -90,9 +90,9 @@ export default {
       const baseUrl = process.env.VUE_APP_BACKEND_BASE_URL
       const endpoint = baseUrl + '/api/v1/games/' + this.game.id
       const data = {
-        player1_id: this.game.player_1_id(),
-        player2_id: this.game.player_2_id(),
-        isFinished: this.game.isFinished(),
+        player1_id: this.game.player_1_id,
+        player2_id: this.game.player_2_id,
+        isFinished: this.game.isFinished,
         grid: this.boardToGrid()
       }
       const requestOptions = {
@@ -115,7 +115,7 @@ export default {
     },
 
     boardToGrid () {
-      let str
+      let str = ''
       for (let m = 0; m < this.board.length; m++) {
         for (let n = 0; n < this.board[m].length; n++) {
           str += this.board[m][n]
@@ -137,6 +137,7 @@ export default {
         if (!this.hasWinner() || !this.isFull()) {
           this.opponentMove()
         }
+        this.updateGame()
       }
     },
     opponentMove () {
