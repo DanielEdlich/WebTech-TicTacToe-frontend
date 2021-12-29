@@ -29,7 +29,7 @@ export default {
     }
   },
   methods: {
-    loadPlayers () {
+    getPlayers () {
       const baseUrl = process.env.VUE_APP_BACKEND_BASE_URL
       const endpoint = baseUrl + '/api/v1/users'
       const requestOptions = {
@@ -47,7 +47,7 @@ export default {
 
   },
   mounted () {
-    this.loadPlayers()
+    this.getPlayers()
   }
 
 }
