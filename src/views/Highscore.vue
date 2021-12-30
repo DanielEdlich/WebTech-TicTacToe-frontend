@@ -1,20 +1,21 @@
 <template>
 <h1> Highscore List</h1>
   <div class = "highscore-list">
-    <table>
+    <table class="table align-middle">
       <thead>
         <tr>
-          <th>Player</th>
-          <th>Points</th>
+          <th scope="col">Player</th>
+          <th scope="col">Points</th>
         </tr>
       </thead>
       <tbody>
-        <div v-for="user in users" :key="user.id">
-          <tr>
-            <td>{{ user.name }}</td>
-            <td>{{ user.highscore }}</td>
-          </tr>
-        </div>
+        <tr v-if="users.length === 0">
+          <td colspan="2">No highscores yet</td>
+        </tr>
+        <tr v-for="user in users" :key="user.id">
+          <td > {{ user.name }} </td>
+          <td > {{ user.highscore}} </td>
+        </tr>
       </tbody>
     </table>
   </div>
