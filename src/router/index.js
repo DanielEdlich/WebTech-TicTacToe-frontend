@@ -4,6 +4,7 @@ import About from '../views/About.vue'
 import Highscore from '../views/Highscore'
 import Login from '../views/Login'
 import Game from '../views/Game'
+import Register from '../views/Register'
 
 const routes = [
   {
@@ -26,6 +27,11 @@ const routes = [
     path: '/login',
     name: 'LogIn',
     component: Login
+  },
+  {
+    path: '/register',
+    name: 'Register',
+    component: Register
   },
   {
     path: '/game',

@@ -1,5 +1,5 @@
 <template>
-<h1>Login</h1>
+  <h1>Login</h1>
   <form class="<<!--position-absolute start-50 justify-content-center--> w-50 mx-auto">
     <div class="mb-3">
       <label for="InputUsername" class="form-label">Username</label>
@@ -10,23 +10,19 @@
       <input v-model="password" type="password" class="form-control" id="InputPassword">
     </div>
     <p>
-      <button type="button" class="btn btn-link btn-sm" @click="() => this.$router.push('/register')">Register</button>
     </p>
-    <button type="button" class="btn btn-primary" @click = "save()">Login</button>
+    <button type="button" class="btn btn-primary" @click = "save()">Register</button>
   </form>
-
-<!--  <input v-model="username" type="text">-->
-<!--  <button type="button" @click = "save()">Create</button>-->
 </template>
 
 <script>
+
 import router from '@/router'
-import store from '@/store'
 
 const { useRouter } = require('vue-router')
 
 export default {
-  name: 'Login',
+  name: 'Register',
   router: useRouter(),
   data () {
     return {
@@ -38,7 +34,7 @@ export default {
     async save () {
       if (this.username !== '' && this.password !== '') {
         const baseUrl = process.env.VUE_APP_BACKEND_BASE_URL
-        const endpoint = baseUrl + '/api/v1/login'
+        const endpoint = baseUrl + '/api/v1/signup'
         const data = {
           name: this.username,
           password: this.password
@@ -53,13 +49,11 @@ export default {
         }
         await fetch(endpoint, requestOptions)
           .then(response => response.json())
-          .then(result => {
-            store.commit('setUser', result)
-          })
+          .then(result => console.log(result))
           .catch(error => console.log('error', error))
-        // alert(this.username + ' logged in')
+        alert(this.username + ' created')
 
-        await router.push('/')
+        await router.push('/login')
       } else {
         console.log('username and password can not be empty')
       }
