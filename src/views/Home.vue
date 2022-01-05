@@ -52,6 +52,7 @@ export default {
   components: {},
   data () {
     return {
+      userID: computed(() => store.state.user.id),
       username: computed(() => store.state.user.name),
       highscore: computed(() => store.state.user.highscore)
     }
