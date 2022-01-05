@@ -1,15 +1,12 @@
 <template>
   <h1>Game</h1>
 
-  <input v-model="requestUId1" type="number" >
-  <input v-model="requestUId2" type="number" >
-  <p></p>
-  <button type="button" @click = "createGame"> create game </button >
-  <p></p>
   <input v-model="requestId" type="number" >
   <button type="button" @click = "getGameById(requestId)">search for Game</button>
 
-  <div class="board">
+  <p v-if="game.id !== Number"> Game ID: {{game.id}}</p>
+
+  <div class="board justify-content-center">
     <div v-for = "m in board.length" :key="m">
       <div v-for="n in board[m-1].length" :key="n" class="cell" @click="processAction(m-1, n-1)">
         <span v-if="board[m-1][n-1] !== '-'"> {{ board[m-1][n-1] }} </span>
@@ -18,8 +15,8 @@
     </div>
   </div>
 
-<!--  <span>{{game}}</span>
-  <span>{{board}}</span>-->
+<!--  <span>{{game}}</span>-->
+<!--  <span>{{board}}</span>-->
 
 </template>
 
@@ -29,8 +26,8 @@ export default {
   data () {
     return {
       requestId: Number,
-      requestUId1: Number,
-      requestUId2: Number,
+      /* requestUId1: Number,
+      requestUId2: Number, */
 
       game: {
         id: Number,
@@ -157,6 +154,7 @@ export default {
       for (let x = 0; x < this.board.length; x++) {
         if (this.board[x][0] === this.board[x][1] && this.board[x][1] === this.board[x][2] && this.board[x][0] !== '-') {
           this.game.isFinished = true
+          this.updateGame()
           return true
         }
       }
@@ -165,6 +163,8 @@ export default {
       for (let y = 0; y < this.board.length; y++) {
         if (this.board[0][y] === this.board[1][y] && this.board[1][y] === this.board[2][y] && this.board[0][y] !== '-') {
           this.game.isFinished = true
+          this.updateGame()
+
           return true
         }
       }
@@ -173,6 +173,7 @@ export default {
       if ((this.board[0][0] === this.board[1][1] && this.board[1][1] === this.board[2][2] && this.board[0][0] !== '-') ||
         (this.board[0][2] === this.board[1][1] && this.board[1][1] === this.board[2][0] && this.board[0][2] !== '-')) {
         this.game.isFinished = true
+        this.updateGame()
         return true
       }
 
@@ -187,6 +188,7 @@ export default {
           }
         }
         this.game.isFinished = true
+        this.updateGame()
         return true
       }
     }
