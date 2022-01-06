@@ -1,5 +1,5 @@
 <template>
-  <table class="table align-middle">
+  <table class="table align-middle w-50 mx-auto">
     <thead>
     <tr>
       <th scope="col">Player</th>
@@ -11,8 +11,8 @@
       <td colspan="2">No highscores yet</td>
     </tr>
     <tr v-for="user in users" :key="user.id">
-      <td> {{ user.name }}</td>
-      <td> {{ user.highscore}}</td>
+      <td v-if="user.highscore !== 0"> {{ user.name }}</td>
+      <td v-if="user.highscore !== 0"> {{ user.highscore}}</td>
     </tr>
     </tbody>
   </table>
