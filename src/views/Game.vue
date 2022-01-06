@@ -19,6 +19,10 @@
     </div>
   </div>
 
+  <div v-if="game.isFinished">
+    <button type="button" class="btn btn-primary" @click="createGame()"> Play again </button>
+  </div>
+
 <!--  <span>{{game}}</span>-->
 <!--  <span>{{board}}</span>-->
 
@@ -76,8 +80,8 @@ export default {
       const baseUrl = process.env.VUE_APP_BACKEND_BASE_URL
       const endpoint = baseUrl + '/api/v1/games'
       const data = {
-        player1_id: this.requestUId1,
-        player2_id: this.requestUId2,
+        player1_id: this.user.id,
+        player2_id: null,
         isFinished: false,
         grid: '---------'
       }
@@ -90,6 +94,23 @@ export default {
       }
       fetch(endpoint, requestOptions)
         .then(response => response.json())
+        // .then(result => console.log(result))
+        // .then(result =>
+        //   this.$router.push({
+        //     name: 'Game',
+        //     params: {
+        //       gameID: result
+        //     }
+        //   }))
+        .then(result => {
+          this.game.id = result
+          this.game.player_1_id = data.player1_id
+          this.game.player_2_id = data.player2_id
+          this.game.isFinished = data.isFinished
+          this.game.grid = data.grid
+
+          this.gridToBoard()
+        })
         .catch(error => console.log('error', error))
     },
 
@@ -251,7 +272,6 @@ export default {
   },
   created () {
     console.log(this.$route.params.gameID)
-    console.log(this.game.id)
     if (this.$route.params.gameID) {
       this.getGameById(this.$route.params.gameID)
     }
