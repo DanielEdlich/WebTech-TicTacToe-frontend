@@ -18,23 +18,23 @@
     <div class="justify-content-center row row-cols-1 row-cols-md-4 g-4" v-if="userID">
       <div class="card createGame">
         <h2 class="card-title">Create a Game.</h2>
-        <!--      <button type="button" class="btn btn-primary" @click="() => this.$router.push('/game')">Create Game</button>-->
+              <button type="button" class="btn btn-primary" @click="createGame()">Create Game</button>
 
-        <div class="btn-group" >
-          <button type="button" class="btn btn-danger">Create Game</button>
-          <button type="button" class="btn btn-danger dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
-            <span class="visually-hidden">Toggle Dropdown</span>
-          </button>
-          <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="#"> new Singleplayer</a></li>
-            <li><a class="dropdown-item" href="#">new Multiplayer</a></li>
-          </ul>
-        </div>
+<!--        <div class="btn-group" >-->
+<!--          <button type="button" class="btn btn-danger">Create Game</button>-->
+<!--          <button type="button" class="btn btn-danger dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">-->
+<!--            <span class="visually-hidden">Toggle Dropdown</span>-->
+<!--          </button>-->
+<!--          <ul class="dropdown-menu">-->
+<!--            <li><a class="dropdown-item" href="#"  @click="createGame()"> new Singleplayer</a></li>-->
+<!--            <li><a class="dropdown-item" href="#" @click="createGame()">new Multiplayer</a></li>-->
+<!--          </ul>-->
+<!--        </div>-->
       </div>
 
     <div class="card joinGame">
         <h2 class="card-title">Join a Game.</h2>
-        <button type="button" class="btn btn-primary" @click="() => this.$router.push('/game')">Join Game</button>
+        <button type="button" class="btn btn-primary" @click="loadGame()">Join Game</button>
       </div>
 
     </div>
@@ -72,6 +72,40 @@ export default {
           this.users.push(user)
         }))
         .catch(error => console.log('error', error))
+    },
+    createSPGame () {
+    },
+    createMPGame () {},
+    createGame () {
+      const baseUrl = process.env.VUE_APP_BACKEND_BASE_URL
+      const endpoint = baseUrl + '/api/v1/games'
+      const data = {
+        player1_id: this.userID,
+        player2_id: null,
+        isFinished: false,
+        grid: '---------'
+      }
+      const requestOptions = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      }
+      fetch(endpoint, requestOptions)
+        .then(response => response.json())
+        // .then(result => console.log(result))
+        .then(result =>
+          this.$router.push({
+            name: 'Game',
+            params: {
+              gameID: result
+            }
+          }))
+        .catch(error => console.log('error', error))
+    },
+    loadGame () {
+      this.$router.push('/game')
     }
 
   }

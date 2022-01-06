@@ -90,7 +90,6 @@ export default {
       }
       fetch(endpoint, requestOptions)
         .then(response => response.json())
-        .then(result => console.log(result))
         .catch(error => console.log('error', error))
     },
 
@@ -140,9 +139,7 @@ export default {
         this.board[m][n] = 'o' */
       if (this.board[m][n] === '-' && !this.game.isFinished) {
         this.board[m][n] = 'X'
-        // console.log(this.hasWinner())
-        // console.log(this.isFull())
-        if (!this.hasWinner() || !this.isFull()) {
+        if (!this.hasWinner() && !this.isFull()) {
           this.opponentMove()
         }
         this.updateGame()
@@ -154,7 +151,6 @@ export default {
       do {
         x = Math.floor(Math.random() * 3)
         y = Math.floor(Math.random() * 3)
-        // console.log(x + ' ' + y)
       } while ((this.board[x][y] === 'X') || (this.board[x][y] === 'O'))
 
       this.board[x][y] = 'O'
@@ -165,7 +161,7 @@ export default {
       for (let x = 0; x < this.board.length; x++) {
         if (this.board[x][0] === this.board[x][1] && this.board[x][1] === this.board[x][2] && this.board[x][0] !== '-') {
           this.game.isFinished = true
-          this.updateGame()
+          this.rewardPoitns(this.game.player_1_id, 20)
           return true
         }
       }
@@ -174,8 +170,7 @@ export default {
       for (let y = 0; y < this.board.length; y++) {
         if (this.board[0][y] === this.board[1][y] && this.board[1][y] === this.board[2][y] && this.board[0][y] !== '-') {
           this.game.isFinished = true
-          this.updateGame()
-
+          this.rewardPoitns(this.game.player_1_id, 20)
           return true
         }
       }
@@ -184,7 +179,7 @@ export default {
       if ((this.board[0][0] === this.board[1][1] && this.board[1][1] === this.board[2][2] && this.board[0][0] !== '-') ||
         (this.board[0][2] === this.board[1][1] && this.board[1][1] === this.board[2][0] && this.board[0][2] !== '-')) {
         this.game.isFinished = true
-        this.updateGame()
+        this.rewardPoitns(this.game.player_1_id, 20)
         return true
       }
 
@@ -199,9 +194,66 @@ export default {
           }
         }
         this.game.isFinished = true
-        this.updateGame()
+        this.rewardPoitns(this.game.player_1_id, 5)
+        if (this.game.player_2_id !== undefined) {
+          this.rewardPoitns(this.game.player_2_id, 5)
+        }
+
+        // this.updateGame()
         return true
       }
+    },
+    rewardPoitns (playerID, amount) {
+      // console.log('playerID: ' + playerID)
+      // console.log('amount: ' + amount)
+      const baseUrl = process.env.VUE_APP_BACKEND_BASE_URL
+      const endpoint = baseUrl + '/api/v1/users/' + playerID
+      let data = {}
+      if (playerID === this.user.id) {
+        data = this.user
+        data.highscore += amount
+      } else {
+        const player = this.getPlayer(playerID)
+        data = {
+          id: playerID,
+          name: player.name,
+          highscore: player.highscore + amount
+        }
+      }
+
+      const requestOptions = {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      }
+      fetch(endpoint, requestOptions)
+        .then(response => response.json())
+        .then(result => console.log(result))
+        .catch(error => console.log('error', error))
+    },
+    getPlayer (playerID) {
+      const baseUrl = process.env.VUE_APP_BACKEND_BASE_URL
+      const endpoint = baseUrl + '/api/v1/users/' + playerID
+      const requestOptions = {
+        method: 'GET',
+        redirect: 'follow'
+      }
+
+      return fetch(endpoint, requestOptions)
+        .then(response => response.json())
+        .then(result => {
+          return result
+        })
+        .catch(error => console.log('error', error))
+    }
+  },
+  created () {
+    console.log(this.$route.params.gameID)
+    console.log(this.game.id)
+    if (this.$route.params.gameID) {
+      this.getGameById(this.$route.params.gameID)
     }
   }
 }
@@ -219,6 +271,19 @@ export default {
     border-width: 1px;
     border-style: solid;
     border-color:  black;
+  }
+
+  .heading {
+    text-align: center;
+    width: 100%;
+  }
+
+  /* Inspired by https://stackoverflow.com/a/23703655 */
+  .board {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
   }
 
 </style>

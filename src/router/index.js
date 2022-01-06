@@ -34,7 +34,13 @@ const routes = [
     component: Register
   },
   {
-    path: '/game',
+    path: '/game/:gameID',
+    name: 'Game',
+    component: Game,
+    props: Number
+  },
+  {
+    path: '/game/',
     name: 'Game',
     component: Game
   }
