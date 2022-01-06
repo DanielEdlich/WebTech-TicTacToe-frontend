@@ -1,12 +1,16 @@
 <template>
   <h1>Game</h1>
 
+  <div v-if="!game.id">
   <input v-model="requestId" type="number" >
   <button type="button" @click = "getGameById(requestId)">search for Game</button>
+  </div>
 
-  <p v-if="game.id !== Number"> Game ID: {{game.id}}</p>
+  <div v-if="$route.params.gameID || this.game.id">
+    <p> Game ID: {{game.id}}</p>
+  </div>
 
-  <div class="board justify-content-center">
+  <div class="board" v-if="game.id">
     <div v-for = "m in board.length" :key="m">
       <div v-for="n in board[m-1].length" :key="n" class="cell" @click="processAction(m-1, n-1)">
         <span v-if="board[m-1][n-1] !== '-'"> {{ board[m-1][n-1] }} </span>
@@ -21,20 +25,27 @@
 </template>
 
 <script>
+import store from '@/store'
+import { computed } from 'vue'
+
 export default {
   name: 'Game',
+  props: {
+    gameID: NaN
+  },
   data () {
     return {
-      requestId: Number,
+      user: computed(() => store.state.user),
+      requestId: NaN,
       /* requestUId1: Number,
       requestUId2: Number, */
 
       game: {
-        id: Number,
-        player_1_id: Number,
-        player_2_id: Number,
-        isFinished: Boolean,
-        grid: String
+        id: NaN,
+        player_1_id: NaN,
+        player_2_id: NaN,
+        isFinished: NaN,
+        grid: ''
       },
       board: [
         ['', '', ''],

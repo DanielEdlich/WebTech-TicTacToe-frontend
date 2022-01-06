@@ -5,9 +5,9 @@ const store = createStore({
   state () {
     return {
       user: {
-        id: Number,
+        id: NaN,
         name: '',
-        highscore: Number
+        highscore: NaN
       }
     }
   },

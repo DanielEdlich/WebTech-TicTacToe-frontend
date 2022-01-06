@@ -1,13 +1,13 @@
 <template>
   <div class="home">
-    <div class="card login" v-if="highscore === Number">
+    <div class="card login" v-if="!userID">
       <div class="card-body">
         <h2 class="card-title">You need to login to use the side.</h2>
         <button type="button" class="btn btn-primary btn-lg" @click="() => this.$router.push('/login')">Login</button>
       </div>
     </div>
 
-   <div class="card userStats" v-if="highscore !== Number">
+   <div class="card userStats" v-if="userID">
       <div class="card-body">
         <h2 class="card-title">Your Stats.</h2>
         <p class="card-text"> {{ username }}</p>
@@ -15,7 +15,7 @@
       </div>
     </div>
 
-    <div class="justify-content-center row row-cols-1 row-cols-md-4 g-4" v-if="highscore !== Number">
+    <div class="justify-content-center row row-cols-1 row-cols-md-4 g-4" v-if="userID">
       <div class="card createGame">
         <h2 class="card-title">Create a Game.</h2>
         <!--      <button type="button" class="btn btn-primary" @click="() => this.$router.push('/game')">Create Game</button>-->
