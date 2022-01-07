@@ -93,15 +93,7 @@ export default {
         body: JSON.stringify(data)
       }
       fetch(endpoint, requestOptions)
-        .then(response => response.json())
-        // .then(result => console.log(result))
-        // .then(result =>
-        //   this.$router.push({
-        //     name: 'Game',
-        //     params: {
-        //       gameID: result
-        //     }
-        //   }))
+        .then(response => response.text())
         .then(result => {
           this.game.id = result
           this.game.player_1_id = data.player1_id

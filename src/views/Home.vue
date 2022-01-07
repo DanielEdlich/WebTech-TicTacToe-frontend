@@ -93,15 +93,17 @@ export default {
         body: JSON.stringify(data)
       }
       fetch(endpoint, requestOptions)
-        .then(response => response.json())
+        .then(response => response.text())
         // .then(result => console.log(result))
-        .then(result =>
+        .then(result => {
+          console.log(result)
           this.$router.push({
             name: 'Game',
             params: {
               gameID: result
             }
-          }))
+          })
+        })
         .catch(error => console.log('error', error))
     },
     loadGame () {
