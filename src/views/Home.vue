@@ -11,7 +11,7 @@
       <div class="card-body">
         <h2 class="card-title">Your Stats.</h2>
         <p class="card-text"> {{ username }}</p>
-        <p class="card-text"> Highscroe: {{ highscore }}</p>
+        <p class="card-text"> Highscore: {{ highscore }}</p>
       </div>
     </div>
 
