@@ -76,7 +76,7 @@ export default {
     createSPGame () {
     },
     createMPGame () {},
-    createGame () {
+    async createGame () {
       const baseUrl = process.env.VUE_APP_BACKEND_BASE_URL
       const endpoint = baseUrl + '/api/v1/games'
       const data = {
@@ -92,15 +92,14 @@ export default {
         },
         body: JSON.stringify(data)
       }
-      fetch(endpoint, requestOptions)
-        .then(response => response.text())
-        // .then(result => console.log(result))
+      await fetch(endpoint, requestOptions)
+        .then(response => response.json())
         .then(result => {
-          console.log(result)
+          console.log(result.id)
           this.$router.push({
             name: 'Game',
             params: {
-              gameID: result
+              gameID: result.id
             }
           })
         })

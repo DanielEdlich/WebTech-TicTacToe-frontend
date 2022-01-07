@@ -20,8 +20,13 @@
   </div>
 
   <div v-if="game.isFinished">
-    <button type="button" class="btn btn-primary" @click="createGame()"> Play again </button>
+    <div class="alert alert-primary" role="alert">
+      <p> Game is finished </p>
+    </div>
+
   </div>
+
+  <button type="button" class="btn btn-primary" @click="createGame()"> Play again </button>
 
 <!--  <span>{{game}}</span>-->
 <!--  <span>{{board}}</span>-->
@@ -93,9 +98,9 @@ export default {
         body: JSON.stringify(data)
       }
       fetch(endpoint, requestOptions)
-        .then(response => response.text())
+        .then(response => response.json())
         .then(result => {
-          this.game.id = result
+          this.game.id = result.id
           this.game.player_1_id = data.player1_id
           this.game.player_2_id = data.player2_id
           this.game.isFinished = data.isFinished
