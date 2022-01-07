@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import Register from '@/views/register'
+import Register from '@/views/Register'
 
 describe('Testing Register.vue', () => {
   it('renders page title', () => {
