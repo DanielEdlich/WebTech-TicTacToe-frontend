@@ -1,6 +1,6 @@
 <template>
   <h1>Register</h1>
-  <form id="users-create-form" class="<<!--position-absolute start-50 justify-content-center--> w-50 mx-auto needs-validation" novalidate>
+  <form id="userscreateform" class="<<!--position-absolute start-50 justify-content-center--> w-50 mx-auto needs-validation" novalidate>
     <div class="mb-3">
       <label for="InputUsername" class="form-label">Username</label>
       <input v-model="username" type="text" class="form-control" id="InputUsername" required>
@@ -15,12 +15,12 @@
         Please provide the password.
       </div>
     </div>
-    <div v-if="error" class="alert alert-danger" role="alert">
+    <div v-if="error" class="alert alert-danger" role="alert" id="Alert">
       {{error}}
     </div>
     <p>
     </p>
-    <button type="button" class="btn btn-primary" @click = "save()">Register</button>
+    <button id="RegisterButton" type="button" class="btn btn-primary" @click = "save()">Register</button>
   </form>
 </template>
 
@@ -98,7 +98,7 @@ export default {
       }
     }, */
     validate () {
-      const form = document.getElementById('users-create-form')
+      const form = document.getElementById('userscreateform')
       form.classList.add('was-validated')
       return form.checkValidity()
     }
