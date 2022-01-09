@@ -15,7 +15,7 @@
         Please provide the password.
       </div>
     </div>
-    <div v-if="error" class="alert alert-danger" role="alert" id="Alert">
+    <div v-if="error" class="alert alert-danger" role="alert">
       {{error}}
     </div>
     <p>
@@ -62,8 +62,6 @@ export default {
           .then(async response => {
             console.log(response)
             if (response.ok) {
-              alert(this.username + ' created')
-              // alert(this.username + ' logged in')
               await router.push('/login')
             } else if (response.status === 400) {
               response = await response.json()
