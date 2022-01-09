@@ -11,7 +11,7 @@
           <router-link class="nav-link" to="Highscore">Highscore</router-link>
           <router-link class="nav-link" to="LogIn">Log In</router-link>
           <router-link class="nav-link" to="About">About</router-link>
-          <router-link class="nav-link" to="Game">Game</router-link>
+<!--          <router-link class="nav-link" to="Game">Game</router-link>-->
 <!--          <a class="nav-link active" aria-current="page" href="#">Home</a>
           <a class="nav-link" href="#">Game</a>
           <a class="nav-link" href="#">Highscore List</a>-->
