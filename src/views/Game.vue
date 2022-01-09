@@ -52,15 +52,6 @@
     </div>
   </div>
 
-  <span>{{game}}</span>
-
-<!--  <button type="button" @click="rewardPoints(user.id, 10)">  reward Points</button>-->
-<!--  <button type="button" @click="rewardPoints(game.player_2_id, 10)">  reward Points</button>-->
-<!--  <input v-model="game.grid" type="text">-->
-<!--  <button type="button" @click="hasWinner()"> winner </button>-->
-<!--  <p> {{board}}</p>-->
-<!--  <span>{{board}}</span>-->
-
 </template>
 
 <script>
@@ -125,9 +116,6 @@ export default {
   methods: {
     // actions
     processAction (m, n) {
-      // eslint-disable-next-line no-unused-vars
-      // const a = this.hasWinner()
-      // this.isFull()
       if (this.board[m][n] === '-' && !this.game.isFinished && this.user.id && !this.waiting) {
         if (this.user.id === this.game.player_1_id) {
           this.board[m][n] = 'X'
@@ -172,8 +160,7 @@ export default {
                 counter++
               }
             }
-            // console.log(counter)
-            // console.log(counter % 2)
+
             if (counter % 2 === 0 && this.game.player_2_id === this.user.id && !this.game.isFinished) {
               this.waitForOpponent()
             } else if (counter % 2 === 1 && this.game.player_1_id === this.user.id && !this.game.isFinished) {
@@ -221,30 +208,17 @@ export default {
     },
 
     hasWinner () {
-      // this.gridToBoard()
-      // console.log(this.board)
       let winner = NaN
       let status = false
 
-      // const getWinner = function (c) {
-      //   console.log((c === 'X') ? this.game.player_1_id : this.game.player_2_id)
-      //   return (c === 'X') ? this.game.player_1_id : this.game.player_2_id
-      // }
-
       // horizontally
       if (!status) {
-        // console.log('hor')
         for (let x = 0; x < this.board.length; x++) {
           // horizontally
-          // console.log(this.board[x][0] === 'X' && this.board[x][1] === 'X' && this.board[x][2] === 'X')
           if (this.board[x][0] === 'X' && this.board[x][1] === 'X' && this.board[x][2] === 'X') {
-            // console.log('ver X' + x)
-            // this.game.isFinished = true
             winner = this.game.player_1_id
             status = true
           } else if (this.board[x][0] === 'O' && this.board[x][1] === 'O' && this.board[x][2] === 'O') {
-            // console.log('ver O' + x)
-            // this.game.isFinished = true
             winner = this.game.player_2_id
             status = true
           }
@@ -252,17 +226,11 @@ export default {
       }
       // vertically
       if (!status) {
-        // console.log('ver')
         for (let x = 0; x < this.board.length; x++) {
-          // console.log(this.board[0][x] === 'X' && this.board[1][x] === 'X' && this.board[2][x] === 'X')
           if (this.board[0][x] === 'X' && this.board[1][x] === 'X' && this.board[2][x] === 'X') {
-            // this.game.isFinished = true
-            // console.log('ver O' + x)
             winner = this.game.player_1_id
             status = true
           } else if (this.board[0][x] === 'O' && this.board[1][x] === 'O' && this.board[2][x] === 'O') {
-            // console.log('ver X' + x)
-            // this.game.isFinished = true
             winner = this.game.player_2_id
             status = true
           }
@@ -271,25 +239,16 @@ export default {
 
       // diagonally
       if (!status) {
-        // console.log('diag')
-        // console.log(this.board[0][0] === 'X' && this.board[1][1] === 'X' && this.board[2][2] === 'X')
-        // console.log(this.board[0][2] === 'X' && this.board[1][1] === 'X' && this.board[2][0] === 'X')
         if ((this.board[0][0] === 'X' && this.board[1][1] === 'X' && this.board[2][2] === 'X') ||
           (this.board[0][2] === 'X' && this.board[1][1] === 'X' && this.board[2][0] === 'X')) {
-          // console.log('diag X')
-          // this.game.isFinished = true
           winner = this.game.player_1_id
           status = true
         } else if ((this.board[0][0] === 'O' && this.board[1][1] === 'O' && this.board[2][2] === 'O') ||
           (this.board[0][2] === 'O' && this.board[1][1] === 'O' && this.board[2][0] === 'O')) {
-          // console.log('diag X')
-          // this.game.isFinished = true
           winner = this.game.player_2_id
           status = true
         }
       }
-
-      // console.log(status)
 
       if (status) {
         if (!this.pointsRewarded) {
@@ -298,7 +257,6 @@ export default {
         }
         this.game.isFinished = true
         return true
-        // this.rewardPoints(winner, 20)
       } else {
         return false
       }
@@ -331,7 +289,6 @@ export default {
     waitForOpponent () {
       this.waiting = true
       this.oldGrid = this.game.grid
-      // console.log('oldGrid: ' + this.oldGrid)
 
       this.reloadData()
     },

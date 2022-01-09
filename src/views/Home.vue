@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <div class="card login" v-if="!userID">
-      <div class="card-body">
+      <div class="card-body justify-content-center p-2">
         <h2 class="card-title">You need to login to use the side.</h2>
         <button type="button" class="btn btn-primary btn-lg" @click="() => this.$router.push('/login')">Login</button>
       </div>
@@ -73,9 +73,6 @@ export default {
         }))
         .catch(error => console.log('error', error))
     },
-    createSPGame () {
-    },
-    createMPGame () {},
     async createGame () {
       const baseUrl = process.env.VUE_APP_BACKEND_BASE_URL
       const endpoint = baseUrl + '/api/v1/games'
@@ -95,7 +92,7 @@ export default {
       await fetch(endpoint, requestOptions)
         .then(response => response.json())
         .then(result => {
-          console.log(result.id)
+          // console.log(result.id)
           this.$router.push({
             name: 'Game',
             params: {

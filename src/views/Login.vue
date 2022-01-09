@@ -64,7 +64,7 @@ export default {
         await fetch(endpoint, requestOptions)
 
           .then(async response => {
-            console.log(response)
+            // console.log(response)
             if (response.ok) {
               const result = await response.json()
               store.commit('setUser', result)
