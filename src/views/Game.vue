@@ -1,8 +1,9 @@
 <template>
-  <h1>Game</h1>
+  <h1 v-if="!game.id">Game</h1>
+  <h1 v-if="game.player_2_id && game.id">Multiplayer Game</h1>
+  <h1 v-if="!game.player_2_id && game.id">Singleplayer Game</h1>
 
-  <div v-if="!game.id" class="head justify-content-center row row-cols-md-2
-">
+  <div v-if="!game.id" class="head justify-content-center row row-cols-md-2">
     <div>
       <label for="inputID"> game ID </label>
       <div class="input-group justify-content-center">
@@ -27,7 +28,7 @@
 
   <div class="main">
 
-    <div class="alert alert-primary" role="alert" v-if="game.player_2_id && !waiting">
+    <div class="alert alert-primary" role="alert" v-if="game.player_2_id && waiting">
       <p> Waiting for opponent </p>
     </div>
 
@@ -52,6 +53,12 @@
   </div>
 
   <span>{{game}}</span>
+
+<!--  <button type="button" @click="rewardPoints(user.id, 10)">  reward Points</button>-->
+<!--  <button type="button" @click="rewardPoints(game.player_2_id, 10)">  reward Points</button>-->
+<!--  <input v-model="game.grid" type="text">-->
+<!--  <button type="button" @click="hasWinner()"> winner </button>-->
+<!--  <p> {{board}}</p>-->
 <!--  <span>{{board}}</span>-->
 
 </template>
@@ -67,15 +74,26 @@ export default {
   },
   data: function () {
     return {
-      // method vars
+    // method vars
       requestId: NaN,
 
       error: '',
       timeout: undefined,
-      waiting: undefined,
+      waiting: false,
+      oldGrid: '',
+      pointsRewarded: false,
 
       // data
-      user: computed(() => store.state.user),
+      user: {
+        id: computed(() => store.state.user.id),
+        name: computed(() => store.state.user.name),
+        highscore: computed(() => store.state.user.highscore)
+      },
+      opponent: {
+        id: NaN,
+        name: '',
+        highscore: NaN
+      },
 
       game: {
         id: NaN,
@@ -91,7 +109,6 @@ export default {
       ]
     }
   },
-
   created () {
     console.log('ID: ' + this.$route.params.gameID)
     if (this.$route.params.gameID) {
@@ -106,65 +123,70 @@ export default {
   },
 
   methods: {
-
     // actions
     processAction (m, n) {
-      console.log(!this.waiting)
-      if (this.board[m][n] === '-' && !this.game.isFinished && !this.hasWinner() && this.user.id && !this.waiting) {
+      // eslint-disable-next-line no-unused-vars
+      // const a = this.hasWinner()
+      // this.isFull()
+      if (this.board[m][n] === '-' && !this.game.isFinished && this.user.id && !this.waiting) {
         if (this.user.id === this.game.player_1_id) {
           this.board[m][n] = 'X'
         } else {
           this.board[m][n] = 'O'
         }
-        this.game.grid = this.boardToGrid()
-        // this.board[m][n] = 'X'
+
         if (!this.hasWinner() && !this.isFull()) {
           if (!this.game.player_2_id) {
             this.opponentMove()
           } else {
-            this.waitForOpponet()
+            this.waitForOpponent()
           }
-        } else {
         }
+        if (!this.board.isFinished) {
+          this.hasWinner()
+          this.isFull()
+        }
+        this.game.grid = this.boardToGrid()
         this.updateGame()
+      } else if (this.waiting && !this.game.isFinished) {
+        this.error = 'It`s not yor turn jet!'
+      } else if (!this.user.id) {
+        this.error = ' You need to bo logged in to play'
       } else {
         this.error = 'Game is already finished'
       }
     },
 
     async loadGame (requestId) {
-      this.getGameById(requestId)
-      setTimeout(() => {
-        // console.log('gid: ' + this.game.id)
-        // console.log('p1: ' + this.game.player_1_id)
-        // console.log('p2: ' + this.game.player_2_id)
-        // console.log('uid: ' + this.user.id)
-        // console.log('p1: ' + !this.game.player_1_id !== this.user.id)
-        // console.log('p2: ' + !this.game.player_2_id)
-
-        if (!this.game.player_2_id && this.game.player_1_id !== this.user.id && !this.error) {
-          this.game.player_2_id = this.user.id
-          this.updateGame()
-        }
-        if (this.game.player_2_id) {
-          let counter = 0
-          for (let a = 0; a < this.game.grid.length; a++) {
-            if (this.game.grid.charAt(a) !== '-') {
-              counter++
+      if (requestId) {
+        this.getGameById(requestId)
+        setTimeout(() => {
+          if (!this.game.player_2_id && this.game.player_1_id !== this.user.id && !this.error) {
+            this.game.player_2_id = this.user.id
+            this.updateGame()
+          }
+          if (this.game.player_2_id) {
+            let counter = 0
+            for (let a = 0; a < this.game.grid.length; a++) {
+              if (this.game.grid.charAt(a) !== '-') {
+                counter++
+              }
+            }
+            // console.log(counter)
+            // console.log(counter % 2)
+            if (counter % 2 === 0 && this.game.player_2_id === this.user.id && !this.game.isFinished) {
+              this.waitForOpponent()
+            } else if (counter % 2 === 1 && this.game.player_1_id === this.user.id && !this.game.isFinished) {
+              this.waitForOpponent()
             }
           }
-          console.log(counter)
-          console.log(counter % 2)
-          if (counter % 2 === 0 && this.game.player_2_id === this.user.id) {
-            this.waitForOpponet()
-          } else if (counter % 2 === 1 && this.game.player_1_id === this.user.id) {
-            this.waitForOpponet()
+          if (!this.timeout) {
+            this.reloadData()
           }
-        }
-        if (!this.timeout) {
-          this.reloadData()
-        }
-      }, 500)
+        }, 500)
+      } else {
+        this.error = 'No ID provided'
+      }
     },
 
     // helper methods
@@ -186,6 +208,8 @@ export default {
     },
 
     opponentMove () {
+      clearTimeout(this.timeout)
+
       let x
       let y
       do {
@@ -197,55 +221,117 @@ export default {
     },
 
     hasWinner () {
+      // this.gridToBoard()
+      // console.log(this.board)
+      let winner = NaN
+      let status = false
+
+      // const getWinner = function (c) {
+      //   console.log((c === 'X') ? this.game.player_1_id : this.game.player_2_id)
+      //   return (c === 'X') ? this.game.player_1_id : this.game.player_2_id
+      // }
+
       // horizontally
-      for (let x = 0; x < this.board.length; x++) {
-        if (this.board[x][0] === this.board[x][1] && this.board[x][1] === this.board[x][2] && this.board[x][0] !== '-') {
-          this.game.isFinished = true
-          this.rewardPoints(this.game.player_1_id, 20)
-          return true
+      if (!status) {
+        // console.log('hor')
+        for (let x = 0; x < this.board.length; x++) {
+          // horizontally
+          // console.log(this.board[x][0] === 'X' && this.board[x][1] === 'X' && this.board[x][2] === 'X')
+          if (this.board[x][0] === 'X' && this.board[x][1] === 'X' && this.board[x][2] === 'X') {
+            // console.log('ver X' + x)
+            // this.game.isFinished = true
+            winner = this.game.player_1_id
+            status = true
+          } else if (this.board[x][0] === 'O' && this.board[x][1] === 'O' && this.board[x][2] === 'O') {
+            // console.log('ver O' + x)
+            // this.game.isFinished = true
+            winner = this.game.player_2_id
+            status = true
+          }
         }
       }
-
       // vertically
-      for (let y = 0; y < this.board.length; y++) {
-        if (this.board[0][y] === this.board[1][y] && this.board[1][y] === this.board[2][y] && this.board[0][y] !== '-') {
-          this.game.isFinished = true
-          this.rewardPoints(this.game.player_1_id, 20)
-          return true
+      if (!status) {
+        // console.log('ver')
+        for (let x = 0; x < this.board.length; x++) {
+          // console.log(this.board[0][x] === 'X' && this.board[1][x] === 'X' && this.board[2][x] === 'X')
+          if (this.board[0][x] === 'X' && this.board[1][x] === 'X' && this.board[2][x] === 'X') {
+            // this.game.isFinished = true
+            // console.log('ver O' + x)
+            winner = this.game.player_1_id
+            status = true
+          } else if (this.board[0][x] === 'O' && this.board[1][x] === 'O' && this.board[2][x] === 'O') {
+            // console.log('ver X' + x)
+            // this.game.isFinished = true
+            winner = this.game.player_2_id
+            status = true
+          }
         }
       }
 
       // diagonally
-      if ((this.board[0][0] === this.board[1][1] && this.board[1][1] === this.board[2][2] && this.board[0][0] !== '-') ||
-        (this.board[0][2] === this.board[1][1] && this.board[1][1] === this.board[2][0] && this.board[0][2] !== '-')) {
-        this.game.isFinished = true
-        this.rewardPoints(this.game.player_1_id, 20)
-        return true
+      if (!status) {
+        // console.log('diag')
+        // console.log(this.board[0][0] === 'X' && this.board[1][1] === 'X' && this.board[2][2] === 'X')
+        // console.log(this.board[0][2] === 'X' && this.board[1][1] === 'X' && this.board[2][0] === 'X')
+        if ((this.board[0][0] === 'X' && this.board[1][1] === 'X' && this.board[2][2] === 'X') ||
+          (this.board[0][2] === 'X' && this.board[1][1] === 'X' && this.board[2][0] === 'X')) {
+          // console.log('diag X')
+          // this.game.isFinished = true
+          winner = this.game.player_1_id
+          status = true
+        } else if ((this.board[0][0] === 'O' && this.board[1][1] === 'O' && this.board[2][2] === 'O') ||
+          (this.board[0][2] === 'O' && this.board[1][1] === 'O' && this.board[2][0] === 'O')) {
+          // console.log('diag X')
+          // this.game.isFinished = true
+          winner = this.game.player_2_id
+          status = true
+        }
       }
 
-      return false
+      // console.log(status)
+
+      if (status) {
+        if (!this.pointsRewarded) {
+          console.log('winner: ' + winner)
+          this.rewardPoints(winner, 20)
+        }
+        this.game.isFinished = true
+        return true
+        // this.rewardPoints(winner, 20)
+      } else {
+        return false
+      }
     },
 
     isFull () {
+      let count = 0
       for (let x = 0; x < this.board.length; x++) {
-        for (let y = 0; y < this.board[x].length; y++) {
+        for (let y = 0; y < this.board.length; y++) {
           if (this.board[x][y] === '-') {
-            return false
+            count++
           }
         }
+      }
+      if (count === 0) {
         this.game.isFinished = true
-        this.rewardPoints(this.game.player_1_id, 5)
-        if (this.game.player_2_id !== undefined) {
-          this.rewardPoints(this.game.player_2_id, 5)
+        if (this.rewardPoints) {
+          this.rewardPoints(this.game.player_1_id, 5)
+          if (this.game.player_2_id) {
+            this.rewardPoints(this.game.player_2_id, 5)
+          }
         }
-
         // this.updateGame()
         return true
+      } else {
+        return false
       }
     },
 
-    waitForOpponet () {
+    waitForOpponent () {
       this.waiting = true
+      this.oldGrid = this.game.grid
+      // console.log('oldGrid: ' + this.oldGrid)
 
       this.reloadData()
     },
@@ -260,22 +346,18 @@ export default {
     reloadData () {
       const delay = 10000
 
-      const oldGrid = this.game.grid
-      console.log('oldGrid: ' + oldGrid)
-
       // eslint-disable-next-line no-unused-vars
       let innerTimeout
       this.timeout = setTimeout(() => {
         console.log('reloadData')
         this.loadGame(this.game.id)
-        console.log(this.game.grid !== oldGrid)
-        if (this.game.grid !== oldGrid) {
+        if (this.game.grid !== this.oldGrid || this.game.isFinished) {
           this.waiting = false
           clearTimeout(this.timeout)
           clearTimeout(innerTimeout)
         } else {
           innerTimeout = setTimeout(() => {
-            if (this.game.grid !== oldGrid) {
+            if (this.game.grid !== this.oldGrid) {
               this.waiting = false
               clearTimeout(this.timeout)
               clearTimeout(innerTimeout)
@@ -287,6 +369,15 @@ export default {
 
     // API requests
     createGame () {
+      // reset data
+      this.pointsRewarded = false
+      this.waiting = false
+      this.opponent = {
+        id: NaN,
+        name: '',
+        highscore: NaN
+      }
+
       const baseUrl = process.env.VUE_APP_BACKEND_BASE_URL
       const endpoint = baseUrl + '/api/v1/games'
       const data = {
@@ -317,7 +408,7 @@ export default {
         .catch(error => console.log('error', error))
     },
 
-    async getGameById (requestID) {
+    getGameById (requestID) {
       const baseUrl = process.env.VUE_APP_BACKEND_BASE_URL
       const endpoint = baseUrl + '/api/v1/games/' + requestID
       const requestOptions = {
@@ -325,18 +416,13 @@ export default {
         redirect: 'follow'
       }
 
-      await fetch(endpoint, requestOptions)
-        .then(async response => await response.json())
-        .then(async result => {
-          //  TODO
-          if (!result.isFinished) {
-            this.game = result
-            await this.gridToBoard()
-            if (!this.game.player_2_id) {
-              this.reloadData()
-            }
-          } else {
-            this.error = 'Game is already finished'
+      fetch(endpoint, requestOptions)
+        .then(response => response.json())
+        .then(result => {
+          this.game = result
+          this.gridToBoard()
+          if (!result.isFinished && !this.game.player_2_id) {
+            this.reloadData()
           }
         })
         .catch(error => console.log('error', error))
@@ -360,42 +446,45 @@ export default {
       }
       fetch(endpoint, requestOptions)
         .then(response => response.json())
-        // .then(result => console.log('update: ' + result))
+      // .then(result => console.log('update: ' + result))
         .catch(error => console.log('error', error))
     },
 
     rewardPoints (playerID, amount) {
+      if (!playerID) {
+        return
+      }
+      console.log(playerID, amount)
       const baseUrl = process.env.VUE_APP_BACKEND_BASE_URL
       const endpoint = baseUrl + '/api/v1/users/' + playerID
 
-      let data = {}
-      if (playerID === this.user.id) {
-        data = this.user
-        data.highscore += amount
-      } else {
-        const player = this.getPlayer(playerID)
-        data = {
-          id: playerID,
-          name: player.name,
-          highscore: player.highscore + amount
+      if (playerID !== this.user.id) {
+        this.getPlayer(playerID)
+      }
+      setTimeout(() => {
+        let score
+        if (playerID === this.user.id) {
+          score = this.user.highscore
+        } else {
+          score = this.opponent.highscore
         }
-      }
 
-      // console.log(data.id)
-      // console.log(data.name)
-      // console.log(data.highscore)
+        const data = {
+          highscore: score + amount
+        }
 
-      const requestOptions = {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-      }
-      fetch(endpoint, requestOptions)
-        .then(response => response.json())
+        const requestOptions = {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        }
+        fetch(endpoint, requestOptions)
+          .then(response => response.json())
         // .then(result => console.log(result))
-        .catch(error => console.log('error', error))
+          .catch(error => console.log('error', error))
+      }, 500)
     },
 
     getPlayer (playerID) {
@@ -406,10 +495,12 @@ export default {
         redirect: 'follow'
       }
 
-      return fetch(endpoint, requestOptions)
+      fetch(endpoint, requestOptions)
         .then(response => response.json())
         .then(result => {
-          return result
+          this.opponent.id = result.id
+          this.opponent.name = result.name
+          this.opponent.highscore = result.highscore
         })
         .catch(error => console.log('error', error))
     }
