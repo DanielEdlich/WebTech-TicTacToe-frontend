@@ -16,15 +16,17 @@
 
   </div>
 
+  <div>
   <div v-if="$route.params.gameID || this.game.id">
     <p> Game ID: {{game.id}}</p>
   </div>
 
   <transition name="fade" @after-enter="startTimer" :duration="{ enter: 100, leave: 100 }">
-    <div v-if="error" class="alert alert-danger" role="alert">
+    <div v-if="error" class="alert alert-danger " role="alert">
       {{error}}
     </div>
   </transition>
+  </div>
 
   <div class="main">
 
@@ -519,11 +521,17 @@ export default {
   /*  transform: translateX(-50%) translateY(-50%);*/
   /*}*/
 
-  body {
+  .body {
     font-family: 'Helvetica Neue', Arial, sans-serif;
     color: #fff;
     background-color: #2c3e50;
     -webkit-font-smoothing: antialiased;
   }
 
+  .alert-danger{
+    position:relative;
+    top: 25px;
+    left: 0px;
+    width: 25%;
+  }
 </style>
